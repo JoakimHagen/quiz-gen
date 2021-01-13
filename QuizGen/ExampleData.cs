@@ -6,36 +6,36 @@ namespace QuizGen
 {
     public static class ExampleData
     {
-        private const string INDUSTRY = "Industry Trademark";
+        private const string AZSRVC = "Azure Service";
 
-        private const string CAR = "Car Brand";
-        private const string HW = "Hardware Store";
-        private const string FOOD = "Food Chain";
-        private const string TECH = "Tech Brand";
+        private const string DNSLB = "DNS Load Balancer";
+        private const string L4LB = "Layer 4 (Transport) Load Balancer";
+        private const string L7LB = "Layer 7 (Application) Load Balancer";
+        private const string L5LB = "Layer 5 (Session) Load Balancer";
 
-        private const string BMW = "BMW";
-        private const string OPEL = "Opel";
-        private const string PRNC = "Princess";
-        private const string AIRBUS = "Airbus";
-        private const string HARLEY = "Harley Davidson";
+        private const string ALB = "Azure Load Balancer";
+        private const string ATM = "Azure Traffic Manager";
+        private const string AAG = "Azure Application Gateway";
+        private const string AFD = "Azure Front Door";
+        private const string ACDN = "Azure Content Delivery Network (CDN)";
 
 
         public static List<Relation> relations = new List<Relation>
         {
-            new Relation(CAR, "is", INDUSTRY),
-            new Relation(BMW, "is", CAR),
-            new Relation(OPEL, "is", CAR)
+            new Relation(DNSLB, "is", AZSRVC),
+            new Relation(L4LB, "is", AZSRVC),
+            new Relation(L7LB, "is", AZSRVC),
+            new Relation(ALB, "is", L4LB),
+            new Relation(ATM, "is", DNSLB),
+            new Relation(AAG, "is", L7LB),
+            new Relation(AFD, "is", L7LB),
+            new Relation(AFD, "is", DNSLB),
+            new Relation(AFD, "is", ACDN),
         };
 
         public static List<Relation> distractions = new List<Relation>
         {
-            new Relation(HW, "is", INDUSTRY),
-            new Relation(FOOD, "is", INDUSTRY),
-            new Relation(TECH, "is", INDUSTRY),
-            new Relation(PRNC, "is not", CAR),
-            new Relation(AIRBUS, "is not", CAR),
-            new Relation(HARLEY, "is not", CAR),
-            new Relation(BMW, "is not", "British Monarchy Warships")
+            new Relation(L5LB, "is", AZSRVC)
         };
     }
 }

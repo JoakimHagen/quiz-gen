@@ -78,7 +78,7 @@ namespace QuizGen
 
             foreach (var answer in answerPool)
             {
-                Console.Write(" - " + answer);
+                Console.WriteLine(" - A " + answer);
             }
 
             Console.WriteLine("\nA: " + String.Join(", ", correct.Where(x => answerPool.Contains(x))));
@@ -131,7 +131,7 @@ namespace QuizGen
 
             foreach (var answer in answerPool)
             {
-                Console.Write(" - " + answer);
+                Console.WriteLine(" - " + answer);
             }
 
             Console.WriteLine("\nA: " + String.Join(", ", correct.Where(x => answerPool.Contains(x))));
