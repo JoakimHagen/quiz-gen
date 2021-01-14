@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace QuizGen
 {
-    public static class RelationExtensions
+    public static class ListExtensions
     {
-        public static bool Contains(this IEnumerable<Relation> self, Relation other)
-        {
-            return false;
-        }
-
         public static void Shuffle<T>(this IList<T> list, Random rng)
         {
             int n = list.Count;

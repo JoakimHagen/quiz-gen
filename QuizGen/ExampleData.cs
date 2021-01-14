@@ -19,25 +19,6 @@ namespace QuizGen
         private const string AFD = "Azure Front Door";
         private const string ACDN = "Azure Content Delivery Network (CDN)";
 
-
-        public static List<Relation> relations = new List<Relation>
-        {
-            new Relation(DNSLB, "is", AZSRVC),
-            new Relation(L4LB, "is", AZSRVC),
-            new Relation(L7LB, "is", AZSRVC),
-            new Relation(ALB, "is", L4LB),
-            new Relation(ATM, "is", DNSLB),
-            new Relation(AAG, "is", L7LB),
-            new Relation(AFD, "is", L7LB),
-            new Relation(AFD, "is", DNSLB),
-            new Relation(AFD, "is", ACDN),
-        };
-
-        public static List<Relation> distractions = new List<Relation>
-        {
-            new Relation(L5LB, "is", AZSRVC)
-        };
-
         public static List<IdentityRelation> idrelations = new List<IdentityRelation>
         {
             new IdentityRelation(DNSLB, AZSRVC),

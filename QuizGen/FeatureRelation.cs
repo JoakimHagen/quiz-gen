@@ -18,13 +18,6 @@ namespace QuizGen
 
         public bool CreateQuestion(Random seed, IEnumerable<FeatureRelation> graph)
         {
-            if (feature == null)
-            {
-                Console.WriteLine(subject + " has feature 'null'");
-                System.Threading.Thread.Sleep(1000);
-                return false;
-            }
-
             var correct = graph
                 .Where(x => x.feature == feature)
                 .Select(x => x.subject)
@@ -53,7 +46,10 @@ namespace QuizGen
                 answerPool.Add(answer);
             }
 
-            Console.WriteLine("Q: Which of the following support " + feature.ToString() + "?");
+            var q = seed.Next(0, 2) > 0
+                ? $"Q: Which of the following support {feature.feature}?"
+                : $"Q: Which of the following can {feature.action}?";
+            Console.WriteLine(q);
 
             answerPool.Shuffle(seed);
 
