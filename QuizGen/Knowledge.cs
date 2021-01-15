@@ -20,6 +20,24 @@ namespace QuizGen
                 .Where(x => !items.Contains(x))
                 .ToArray();
 
+            var features = Features
+                .Where(x => items.Contains(x.subject))
+                .Select(x => x.feature)
+                .ToArray();
+
+            if (features.Length > 0)
+            {
+                var featuresBySimilarity = Features
+                    .GroupBy(x => x.subject)
+                    .Select(g => (subject: g.Key, count: g.Count(x => features.Contains(x.feature))))
+                    .OrderBy(g => g.count);
+
+                similar = similar
+                    .Concat(featuresBySimilarity.Select(x => x.subject))
+                    .Distinct()
+                    .ToArray();
+            }
+
             return similar;
         }
     }
