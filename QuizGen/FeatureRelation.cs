@@ -16,17 +16,15 @@ namespace QuizGen
             this.feature = feature;
         }
 
-        public bool CreateQuestion(Random seed, IEnumerable<FeatureRelation> graph)
+        public bool CreateQuestion(Random seed, Knowledge knowledge)
         {
-            var correct = graph
+            var correct = knowledge.Features
                 .Where(x => x.feature == feature)
                 .Select(x => x.subject)
                 .Distinct()
                 .ToArray();
 
-            var identityofcorrect = IdentityRelation.IdentitiesOf(ExampleData.idrelations, correct);
-
-            var distractions = IdentityRelation.SubjectsOf(ExampleData.idrelations, identityofcorrect)
+            var distractions = knowledge.FindSimilar(correct)
                 .Where(x => !correct.Contains(x))
                 .ToArray();
 

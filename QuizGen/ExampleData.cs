@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QuizGen
 {
-    public static class ExampleData
+    public class ExampleData : Knowledge
     {
         private const string AZSRVC = "Azure Service";
 
@@ -18,19 +18,6 @@ namespace QuizGen
         private const string AAG = "Azure Application Gateway";
         private const string AFD = "Azure Front Door";
         private const string ACDN = "Azure Content Delivery Network (CDN)";
-
-        public static List<IdentityRelation> idrelations = new List<IdentityRelation>
-        {
-            new IdentityRelation(DNSLB, AZSRVC),
-            new IdentityRelation(L4LB, AZSRVC),
-            new IdentityRelation(L7LB, AZSRVC),
-            new IdentityRelation(ALB, L4LB),
-            new IdentityRelation(ATM, DNSLB),
-            new IdentityRelation(AAG, L7LB),
-            new IdentityRelation(AFD, L7LB),
-            new IdentityRelation(AFD, DNSLB),
-            new IdentityRelation(AFD, ACDN),
-        };
 
         private static Feature WAF = new Feature
         {
@@ -53,14 +40,30 @@ namespace QuizGen
             action = "direct dns requests to frontends based on location and latency"
         };
 
-        public static List<FeatureRelation> featureRelations = new List<FeatureRelation>
+        public ExampleData()
         {
-            new FeatureRelation(ATM, CDNSR),
-            new FeatureRelation( AFD, CDNSR ),
-            new FeatureRelation( AFD, WAF ),
-            new FeatureRelation( AAG, WAF ),
-            new FeatureRelation( AFD, CDTR ),
-            new FeatureRelation( AFD, CQSR ),
-        };
+            Identities = new List<IdentityRelation>
+            {
+                new IdentityRelation(DNSLB, AZSRVC),
+                new IdentityRelation(L4LB, AZSRVC),
+                new IdentityRelation(L7LB, AZSRVC),
+                new IdentityRelation(ALB, L4LB),
+                new IdentityRelation(ATM, DNSLB),
+                new IdentityRelation(AAG, L7LB),
+                new IdentityRelation(AFD, L7LB),
+                new IdentityRelation(AFD, DNSLB),
+                new IdentityRelation(AFD, ACDN),
+            };
+
+            Features = new List<FeatureRelation>
+            {
+                new FeatureRelation(ATM, CDNSR),
+                new FeatureRelation(AFD, CDNSR),
+                new FeatureRelation(AFD, WAF),
+                new FeatureRelation(AAG, WAF),
+                new FeatureRelation(AFD, CDTR),
+                new FeatureRelation(AFD, CQSR),
+            };
+        }
     }
 }

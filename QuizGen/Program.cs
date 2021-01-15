@@ -6,6 +6,8 @@ namespace QuizGen
 {
     class Program
     {
+        static readonly Knowledge knowledge = new ExampleData();
+
         static void Main(string[] args)
         {
             var random = new Random();
@@ -22,20 +24,20 @@ namespace QuizGen
 
         private static bool AskAboutFeature(Random seed)
         {
-            var i = seed.Next(0, ExampleData.featureRelations.Count);
+            var i = seed.Next(0, knowledge.Features.Count);
 
-            var relation = ExampleData.featureRelations[i];
+            var relation = knowledge.Features[i];
 
-            return relation.CreateQuestion(seed, ExampleData.featureRelations);
+            return relation.CreateQuestion(seed, knowledge);
         }
 
         private static bool AskAboutIdentity(Random seed)
         {
-            var i = seed.Next(0, ExampleData.idrelations.Count);
+            var i = seed.Next(0, knowledge.Identities.Count);
 
-            var relation = ExampleData.idrelations[i];
+            var relation = knowledge.Identities[i];
 
-            return relation.CreateQuestion(seed, ExampleData.idrelations);
+            return relation.CreateQuestion(seed, knowledge);
         }
     }
 }

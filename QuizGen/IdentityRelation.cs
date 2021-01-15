@@ -15,48 +15,46 @@ namespace QuizGen
             this.identity = identity;
         }
 
-        public static IEnumerable<string> IdentitiesOf(IEnumerable<IdentityRelation> graph, IEnumerable<string> subject)
+        public static IEnumerable<string> IdentitiesOf(Knowledge knowledge, IEnumerable<string> subject)
         {
-            return graph
+            return knowledge.Identities
                 .Where(x => subject.Contains(x.subject))
                 .Select(x => x.identity)
                 .Distinct();
         }
 
-        public static IEnumerable<string> SubjectsOf(IEnumerable<IdentityRelation> graph, IEnumerable<string> identities)
+        public static IEnumerable<string> SubjectsOf(Knowledge knowledge, IEnumerable<string> identities)
         {
-            return graph
+            return knowledge.Identities
                 .Where(x => identities.Contains(x.identity))
                 .Select(x => x.subject)
                 .Distinct();
         }
 
-        public bool CreateQuestion(Random seed, IEnumerable<IdentityRelation> graph)
+        public bool CreateQuestion(Random seed, Knowledge knowledge)
         {
             var choice = seed.Next(0, 2) > 0;
             var ok = choice
-                ? AskForIdentity(seed, graph)
-                : AskForSubjects(seed, graph);
+                ? AskForIdentity(seed, knowledge)
+                : AskForSubjects(seed, knowledge);
             if (!ok)
             {
                 ok = !choice
-                    ? AskForIdentity(seed, graph)
-                    : AskForSubjects(seed, graph);
+                    ? AskForIdentity(seed, knowledge)
+                    : AskForSubjects(seed, knowledge);
             }
             return ok;
         }
 
-        private bool AskForIdentity(Random seed, IEnumerable<IdentityRelation> graph)
+        private bool AskForIdentity(Random seed, Knowledge knowledge)
         {
-            var correct = graph
+            var correct = knowledge.Identities
                 .Where(x => x.subject == subject)
                 .Select(x => x.identity)
                 .Distinct()
                 .ToArray();
 
-            var identityofcorrect = IdentitiesOf(graph, correct);
-
-            var distractions = SubjectsOf(graph, identityofcorrect)
+            var distractions = knowledge.FindSimilar(correct)
                 .Where(x => !correct.Contains(x))
                 .ToArray();
 
@@ -89,17 +87,15 @@ namespace QuizGen
             return true;
         }
 
-        private bool AskForSubjects(Random seed, IEnumerable<IdentityRelation> graph)
+        private bool AskForSubjects(Random seed, Knowledge knowledge)
         {
-            var correct = graph
+            var correct = knowledge.Identities
                 .Where(x => x.identity == identity)
                 .Select(x => x.subject)
                 .Distinct()
                 .ToArray();
 
-            var identityofcorrect = IdentitiesOf(graph, correct);
-
-            var distractions = SubjectsOf(graph, identityofcorrect)
+            var distractions = knowledge.FindSimilar(correct)
                 .Where(x => !correct.Contains(x))
                 .ToArray();
 
