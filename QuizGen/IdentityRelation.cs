@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace QuizGen
 {
@@ -104,27 +105,19 @@ namespace QuizGen
                 return false;
             }
 
-            var answerPool = new List<string>();
-
-            answerPool.Add(correct[seed.Next(0, correct.Length)]);
-
             distractions.Shuffle(seed);
+            distractions = distractions.Take(5).ToArray();
 
-            foreach (var answer in distractions.Take(5))
+            var an = Regex.IsMatch(identity, "^[aeiouyæøåAEIOUYÆØÅ]") ? "an": "a";
+
+            var question = new Question
             {
-                answerPool.Add(answer);
-            }
+                Stem = $"Which of the following is {an} {identity}?",
+                Correct = correct,
+                Distraction = distractions
+            };
 
-            Console.WriteLine("Q: Which of the following is a " + identity + "?");
-
-            answerPool.Shuffle(seed);
-
-            foreach (var answer in answerPool)
-            {
-                Console.WriteLine(" - " + answer);
-            }
-
-            Console.WriteLine("\nA: " + String.Join(", ", correct.Where(x => answerPool.Contains(x))));
+            question.PrintToConsole(seed);
 
             return true;
         }

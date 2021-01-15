@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace QuizGen
 {
@@ -14,9 +12,7 @@ namespace QuizGen
 
             while (true)
             {
-                var ok = random.Next(0, 2) > 0
-                    ? AskAboutFeature(random)
-                    : AskAboutIdentity(random);
+                var ok = random.Choose<Random, bool>(AskAboutIdentity, AskAboutFeature)(random);
 
                 if (ok) Console.ReadLine();
             }

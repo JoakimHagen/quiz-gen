@@ -33,30 +33,21 @@ namespace QuizGen
                 return false;
             }
 
-            var answerPool = new List<string>();
-
-            answerPool.Add(correct[seed.Next(0, correct.Length)]);
-
             distractions.Shuffle(seed);
+            distractions = distractions.Take(5).ToArray();
 
-            foreach (var answer in distractions.Take(5))
+            var stem = seed.Choose(
+                $"Which of the following support {feature.feature}?",
+                $"Which of the following can {feature.action}?");
+
+            var question = new Question
             {
-                answerPool.Add(answer);
-            }
+                Stem = stem,
+                Correct = correct,
+                Distraction = distractions
+            };
 
-            var q = seed.Next(0, 2) > 0
-                ? $"Q: Which of the following support {feature.feature}?"
-                : $"Q: Which of the following can {feature.action}?";
-            Console.WriteLine(q);
-
-            answerPool.Shuffle(seed);
-
-            foreach (var answer in answerPool)
-            {
-                Console.WriteLine(" - " + answer);
-            }
-
-            Console.WriteLine("\nA: " + String.Join(", ", correct.Where(x => answerPool.Contains(x))));
+            question.PrintToConsole(seed);
 
             return true;
         }
