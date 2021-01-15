@@ -32,22 +32,22 @@ namespace QuizGen
                 .Distinct();
         }
 
-        public bool CreateQuestion(Random seed, Knowledge knowledge)
+        public Question CreateQuestion(Random seed, Knowledge knowledge)
         {
             var choice = seed.Next(0, 2) > 0;
-            var ok = choice
+            var q = choice
                 ? AskForIdentity(seed, knowledge)
                 : AskForSubjects(seed, knowledge);
-            if (!ok)
+            if (q == null)
             {
-                ok = !choice
+                q = !choice
                     ? AskForIdentity(seed, knowledge)
                     : AskForSubjects(seed, knowledge);
             }
-            return ok;
+            return q;
         }
 
-        private bool AskForIdentity(Random seed, Knowledge knowledge)
+        private Question AskForIdentity(Random seed, Knowledge knowledge)
         {
             var correct = knowledge.Identities
                 .Where(x => x.subject == subject)
@@ -61,34 +61,21 @@ namespace QuizGen
 
             if (distractions.Length == 0)
             {
-                return false;
+                return null;
             }
-
-            var answerPool = new List<string>();
-
-            answerPool.Add(correct[seed.Next(0, correct.Length)]);
 
             distractions.Shuffle(seed);
+            distractions = distractions.Take(5).ToArray();
 
-            foreach (var answer in distractions.Take(5))
+            return new Question
             {
-                answerPool.Add(answer);
-            }
-
-            Console.WriteLine("Q: " + subject + " is which of the following?");
-
-            answerPool.Shuffle(seed);
-
-            foreach (var answer in answerPool)
-            {
-                Console.WriteLine(" - A " + answer);
-            }
-
-            Console.WriteLine("\nA: " + String.Join(", ", correct.Where(x => answerPool.Contains(x))));
-            return true;
+                Stem = subject + " is which of the following?",
+                Correct = correct,
+                Distraction = distractions
+            };
         }
 
-        private bool AskForSubjects(Random seed, Knowledge knowledge)
+        private Question AskForSubjects(Random seed, Knowledge knowledge)
         {
             var correct = knowledge.Identities
                 .Where(x => x.identity == identity)
@@ -102,7 +89,7 @@ namespace QuizGen
 
             if (distractions.Length == 0)
             {
-                return false;
+                return null;
             }
 
             distractions.Shuffle(seed);
@@ -110,16 +97,12 @@ namespace QuizGen
 
             var an = Regex.IsMatch(identity, "^[aeiouyæøåAEIOUYÆØÅ]") ? "an": "a";
 
-            var question = new Question
+            return new Question
             {
                 Stem = $"Which of the following is {an} {identity}?",
                 Correct = correct,
                 Distraction = distractions
             };
-
-            question.PrintToConsole(seed);
-
-            return true;
         }
     }
 }

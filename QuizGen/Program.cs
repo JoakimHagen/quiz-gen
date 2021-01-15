@@ -12,13 +12,19 @@ namespace QuizGen
 
             while (true)
             {
-                var ok = random.Choose<Random, bool>(AskAboutIdentity, AskAboutFeature)(random);
+                var question = random.Choose<Random, Question>(AskAboutIdentity, AskAboutFeature)(random);
 
-                if (ok) Console.ReadLine();
+                if (question != null)
+                {
+                    question.PrintToConsole(random);
+                    Console.ReadLine();
+
+                    Console.WriteLine($"A: {String.Join(", ", question.Correct)}\n\n");
+                }
             }
         }
 
-        private static bool AskAboutFeature(Random seed)
+        private static Question AskAboutFeature(Random seed)
         {
             var i = seed.Next(0, knowledge.Features.Count);
 
@@ -27,7 +33,7 @@ namespace QuizGen
             return relation.CreateQuestion(seed, knowledge);
         }
 
-        private static bool AskAboutIdentity(Random seed)
+        private static Question AskAboutIdentity(Random seed)
         {
             var i = seed.Next(0, knowledge.Identities.Count);
 

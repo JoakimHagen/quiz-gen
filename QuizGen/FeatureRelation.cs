@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace QuizGen
@@ -16,7 +15,7 @@ namespace QuizGen
             this.feature = feature;
         }
 
-        public bool CreateQuestion(Random seed, Knowledge knowledge)
+        public Question CreateQuestion(Random seed, Knowledge knowledge)
         {
             var correct = knowledge.Features
                 .Where(x => x.feature == feature)
@@ -30,7 +29,7 @@ namespace QuizGen
 
             if (distractions.Length == 0)
             {
-                return false;
+                return null;
             }
 
             distractions.Shuffle(seed);
@@ -40,16 +39,12 @@ namespace QuizGen
                 $"Which of the following support {feature.feature}?",
                 $"Which of the following can {feature.action}?");
 
-            var question = new Question
+            return new Question
             {
                 Stem = stem,
                 Correct = correct,
                 Distraction = distractions
             };
-
-            question.PrintToConsole(seed);
-
-            return true;
         }
     }
 

@@ -21,8 +21,6 @@ namespace QuizGen
             {
                 Console.WriteLine(" - " + answer);
             }
-
-            Console.WriteLine("\nA: " + String.Join(", ", Correct));
         }
     }
 }
