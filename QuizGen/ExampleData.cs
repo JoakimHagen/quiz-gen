@@ -39,6 +39,28 @@ namespace QuizGen
             feature = "conditional domain name service (DNS) routing",
             action = "direct dns requests to frontends based on location and latency"
         };
+        private static Feature RUM = new Feature
+        {
+            feature = "Real User Measurements (RUM)",
+            action = "measure network latency to Azure regions from the end users' client web-applications"
+        };
+
+        private static FeatureCondition ATMCOND = new FeatureCondition
+        {
+            action = "generating a RUM key and embedding it and a javascript file into the webpage"
+        };
+        private static FeatureCondition ATMCOND2 = new FeatureCondition
+        {
+            action = "switching the \"Real User Measurements\" feature on in the diagnostic settings"
+        };
+        private static FeatureCondition ATMCOND3 = new FeatureCondition
+        {
+            action = "connecting the resource to Application Insights"
+        };
+        private static FeatureCondition ATMCOND4 = new FeatureCondition
+        {
+            action = "doing nothing. It's enabled by default"
+        };
 
         public ExampleData()
         {
@@ -55,6 +77,8 @@ namespace QuizGen
                 new IdentityRelation(AFD, ACDN),
             };
 
+            var atm_rum = new FeatureRelation(ATM, RUM);
+
             Features = new List<FeatureRelation>
             {
                 new FeatureRelation(ATM, CDNSR),
@@ -63,6 +87,19 @@ namespace QuizGen
                 new FeatureRelation(AAG, WAF),
                 new FeatureRelation(AFD, CDTR),
                 new FeatureRelation(AFD, CQSR),
+                atm_rum,
+            };
+
+            Conditions = new List<ConditionRelation>
+            {
+                new ConditionRelation(atm_rum, ATMCOND)
+            };
+
+            DistractConditions = new List<ConditionRelation>
+            {
+                new ConditionRelation(atm_rum, ATMCOND2),
+                new ConditionRelation(atm_rum, ATMCOND3),
+                new ConditionRelation(atm_rum, ATMCOND4)
             };
         }
     }

@@ -12,7 +12,11 @@ namespace QuizGen
 
             while (true)
             {
-                var question = random.Choose<Random, Question>(AskAboutIdentity, AskAboutFeature)(random);
+                var question = random.Choose<Random, Question>(
+                    AskAboutIdentity,
+                    AskAboutFeature,
+                    AskAboutCondition
+                )(random);
 
                 if (question != null)
                 {
@@ -38,6 +42,15 @@ namespace QuizGen
             var i = seed.Next(0, knowledge.Identities.Count);
 
             var relation = knowledge.Identities[i];
+
+            return relation.CreateQuestion(seed, knowledge);
+        }
+
+        private static Question AskAboutCondition(Random seed)
+        {
+            var i = seed.Next(0, knowledge.Conditions.Count);
+
+            var relation = knowledge.Conditions[i];
 
             return relation.CreateQuestion(seed, knowledge);
         }

@@ -11,6 +11,8 @@ namespace QuizGen
     {
         public List<IdentityRelation> Identities;
         public List<FeatureRelation> Features;
+        public List<ConditionRelation> Conditions;
+        public List<ConditionRelation> DistractConditions;
 
         public string[] FindSimilar(IEnumerable<string> items)
         {
