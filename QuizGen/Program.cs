@@ -11,48 +11,26 @@ namespace QuizGen
             var random = new Random();
 
             while (true)
-            {
+            {/*
                 var question = random.Choose<Random, Question>(
                     AskAboutIdentity,
                     AskAboutFeature,
                     AskAboutCondition
                 )(random);
+                */
+
+                var qq = new NamedRelationQuestions(knowledge);
+
+                var question = qq.Question(random, knowledge.Relations[random.Next(0, knowledge.Relations.Count)]);
 
                 if (question != null)
                 {
                     question.PrintToConsole(random);
                     Console.ReadLine();
 
-                    Console.WriteLine($"A: {String.Join(", ", question.Correct)}\n\n");
+                    Console.WriteLine($"A: {String.Join(", ", question.Answers)}\n\n");
                 }
             }
-        }
-
-        private static Question AskAboutFeature(Random seed)
-        {
-            var i = seed.Next(0, knowledge.Features.Count);
-
-            var relation = knowledge.Features[i];
-
-            return relation.CreateQuestion(seed, knowledge);
-        }
-
-        private static Question AskAboutIdentity(Random seed)
-        {
-            var i = seed.Next(0, knowledge.Identities.Count);
-
-            var relation = knowledge.Identities[i];
-
-            return relation.CreateQuestion(seed, knowledge);
-        }
-
-        private static Question AskAboutCondition(Random seed)
-        {
-            var i = seed.Next(0, knowledge.Conditions.Count);
-
-            var relation = knowledge.Conditions[i];
-
-            return relation.CreateQuestion(seed, knowledge);
         }
     }
 }

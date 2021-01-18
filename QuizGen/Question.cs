@@ -6,18 +6,18 @@ namespace QuizGen
     public class Question
     {
         public string Stem;
-        public string[] Correct;
-        public string[] Distraction;
+        public string[] Answers;
+        public string[] Distractors;
 
         public void PrintToConsole(Random seed)
         {
             Console.WriteLine("Q: " + Stem);
 
-            var answerPool = Correct.Concat(Distraction).ToArray();
+            var options = Answers.Concat(Distractors).ToArray();
 
-            answerPool.Shuffle(seed);
+            options.Shuffle(seed);
 
-            foreach (var answer in answerPool)
+            foreach (var answer in options)
             {
                 Console.WriteLine(" - " + answer);
             }

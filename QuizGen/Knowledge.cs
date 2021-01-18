@@ -9,33 +9,38 @@ namespace QuizGen
     /// </summary>
     public class Knowledge
     {
-        public List<IdentityRelation> Identities;
-        public List<FeatureRelation> Features;
-        public List<ConditionRelation> Conditions;
-        public List<ConditionRelation> DistractConditions;
+        public List<NamedRelation> Relations;
 
         public string[] FindSimilar(IEnumerable<string> items)
         {
-            var identityOfItems = IdentityRelation.IdentitiesOf(this, items);
+            var identityOfItems = Relations
+                .Where(x => items.Contains(x.subject) && x.name == "id")
+                .Select(x => x.target)
+                .ToArray();
 
-            var similar = IdentityRelation.SubjectsOf(this, identityOfItems)
+            var similar = Relations
+                .Where(x => identityOfItems.Contains(x.target) && x.name == "id")
+                .Select(x => x.subject)
                 .Where(x => !items.Contains(x))
                 .ToArray();
 
-            var features = Features
-                .Where(x => items.Contains(x.subject))
-                .Select(x => x.feature)
+            var featuresOfItems = Relations
+                .Where(x => items.Contains(x.subject) && x.name == "feature")
+                .Select(x => x.target)
                 .ToArray();
 
-            if (features.Length > 0)
+            if (featuresOfItems.Length > 0)
             {
-                var featuresBySimilarity = Features
+                var subjectsWithSimilarFeatures = Relations
+                    .Where(x => x.name == "feature")
                     .GroupBy(x => x.subject)
-                    .Select(g => (subject: g.Key, count: g.Count(x => features.Contains(x.feature))))
-                    .OrderBy(g => g.count);
+                    .Select(g => (subject: g.Key, count: g.Count(x => featuresOfItems.Contains(x.target))))
+                    .Where(g => g.count > 0 && !items.Contains(g.subject))
+                    .OrderByDescending(g => g.count)
+                    .Take(5);
 
                 similar = similar
-                    .Concat(featuresBySimilarity.Select(x => x.subject))
+                    .Concat(subjectsWithSimilarFeatures.Select(g => g.subject))
                     .Distinct()
                     .ToArray();
             }
