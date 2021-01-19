@@ -24,46 +24,8 @@ namespace QuizGen
         private static string CDNSR = "conditional domain name service (DNS) routing";
         private static string RUM = "Real User Measurements (RUM)";
 
-        /*
-        private static FeatureCondition ATMCOND = new FeatureCondition
-        {
-            action = "generating a RUM key and embedding it and a javascript file into the webpage"
-        };
-        private static FeatureCondition ATMCOND2 = new FeatureCondition
-        {
-            action = "switching the \"Real User Measurements\" feature on in the diagnostic settings"
-        };
-        private static FeatureCondition ATMCOND3 = new FeatureCondition
-        {
-            action = "connecting the resource to Application Insights"
-        };
-        private static FeatureCondition ATMCOND4 = new FeatureCondition
-        {
-            action = "doing nothing. It's enabled by default"
-        };
-        */
-
         public ExampleData()
         {
-            /*
-            var atm_rum = new FeatureRelation(ATM, RUM);
-
-
-            Conditions = new List<ConditionRelation>
-            {
-                new ConditionRelation(atm_rum, ATMCOND)
-            };
-
-            DistractConditions = new List<ConditionRelation>
-            {
-                new ConditionRelation(atm_rum, ATMCOND2),
-                new ConditionRelation(atm_rum, ATMCOND3),
-                new ConditionRelation(atm_rum, ATMCOND4)
-            };
-            */
-
-            // new implementation
-
             Relations = new List<NamedRelation>
             {
                 new NamedRelation(DNSLB, "id", AZSRVC),
@@ -89,6 +51,11 @@ namespace QuizGen
                 new NamedRelation(CDTR, "ability", "route network traffic based on the device type of the requester"),
                 new NamedRelation(CQSR, "ability", "route network traffic based on the content of the request url query-string"),
                 new NamedRelation(RUM, "ability", "measure network latency to Azure regions from the end users' client web-applications"),
+
+                new NamedRelation(RUM, "condition", "generating a RUM key and embedding it and a javascript file into the webpage"),
+                new NamedRelation(RUM, "!condition", "switching the \"Real User Measurements\" feature on in the diagnostic settings"),
+                new NamedRelation(RUM, "!condition", "connecting the resource to Application Insights"),
+                new NamedRelation(RUM, "!condition", "doing nothing. It's enabled by default"),
             };
         }
     }

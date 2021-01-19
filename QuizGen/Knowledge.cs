@@ -45,6 +45,30 @@ namespace QuizGen
                     .ToArray();
             }
 
+            var relationsTo = Relations
+                .Where(x => items.Contains(x.target))
+                .GroupBy(x => x.name);
+
+            foreach (var rel in relationsTo)
+            {
+                var key = rel.Key;
+                if (key.StartsWith('!'))
+                {
+                    key = key.Substring(1);
+                }
+                else
+                {
+                    key = "!" + key;
+                }
+
+                similar = similar
+                    .Concat(Relations
+                        .Where(x => x.name == key && rel.Any(y => y.subject == x.subject))
+                        .Select(x => x.target))
+                    .Distinct()
+                    .ToArray();
+            }
+
             return similar;
         }
     }

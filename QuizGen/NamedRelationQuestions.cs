@@ -27,6 +27,10 @@ namespace QuizGen
             {
                 return AskForAbilitySubjects(seed, relation);
             }
+            else if (relation.name == "condition")
+            {
+                return AskForCondition(seed, relation);
+            }
             else return null;
         }
 
@@ -125,6 +129,33 @@ namespace QuizGen
             distractors = distractors.Take(5).ToArray();
 
             var stem = $"Which of the following can {relation.target}?";
+
+            return new Question
+            {
+                Stem = stem,
+                Answers = answers,
+                Distractors = distractors
+            };
+        }
+
+        private Question AskForCondition(Random seed, NamedRelation relation)
+        {
+            var answers = knowledge.Relations
+                .Where(x => x.subject == relation.subject && x.name == relation.name)
+                .Select(x => x.target)
+                .ToArray();
+
+            var distractors = knowledge.FindSimilar(answers);
+
+            if (distractors.Length == 0)
+            {
+                return null;
+            }
+
+            distractors.Shuffle(seed);
+            distractors = distractors.Take(5).ToArray();
+
+            var stem = $"How would you make sure {relation.subject} is enabled?";
 
             return new Question
             {
