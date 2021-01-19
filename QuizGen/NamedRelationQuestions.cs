@@ -21,7 +21,7 @@ namespace QuizGen
             }
             else if (relation.name == "feature")
             {
-                return AskForFeatureSubjects(seed, relation);
+                return AskForFeature(seed, relation);
             }
             else if (relation.name == "ability")
             {
@@ -48,18 +48,6 @@ namespace QuizGen
                     .Select(x => x.subject)
                     .ToArray();
 
-            var distractors = knowledge.FindSimilar(answers)
-                .Where(x => !answers.Contains(x))
-                .ToArray();
-
-            if (distractors.Length == 0)
-            {
-                return null;
-            }
-
-            distractors.Shuffle(seed);
-            distractors = distractors.Take(5).ToArray();
-
             var stem = "";
             if (direction)
             {
@@ -71,39 +59,34 @@ namespace QuizGen
                 stem = $"Which of the following is {an} {relation.target}?";
             }
 
-            return new Question
-            {
-                Stem = stem,
-                Answers = answers,
-                Distractors = distractors
-            };
+            return FillDistractors(seed, stem, answers);
         }
 
-        private Question AskForFeatureSubjects(Random seed, NamedRelation relation)
+        private Question AskForFeature(Random seed, NamedRelation relation)
         {
-            var answers = knowledge.Relations
-                .Where(x => x.target == relation.target && x.name == relation.name)
-                .Select(x => x.subject)
-                .ToArray();
+            var direction = seed.Next(0, 2) > 0;
 
-            var distractors = knowledge.FindSimilar(answers);
+            var answers = direction
+                ? knowledge.Relations
+                    .Where(x => x.subject == relation.subject && x.name == relation.name)
+                    .Select(x => x.target)
+                    .ToArray()
+                : knowledge.Relations
+                    .Where(x => x.target == relation.target && x.name == relation.name)
+                    .Select(x => x.subject)
+                    .ToArray();
 
-            if (distractors.Length == 0)
+            var stem = "";
+            if (direction)
             {
-                return null;
+                stem = $"Which of the following is a feature of {relation.subject}?";
+            }
+            else
+            {
+                stem = $"Which of the following support {relation.target}?";
             }
 
-            distractors.Shuffle(seed);
-            distractors = distractors.Take(5).ToArray();
-
-            var stem = $"Which of the following support {relation.target}?";
-
-            return new Question
-            {
-                Stem = stem,
-                Answers = answers,
-                Distractors = distractors
-            };
+            return FillDistractors(seed, stem, answers);
         }
 
         private Question AskForAbilitySubjects(Random seed, NamedRelation relation)
@@ -118,24 +101,9 @@ namespace QuizGen
                 .Select(x => x.subject)
                 .ToArray();
 
-            var distractors = knowledge.FindSimilar(answers);
-
-            if (distractors.Length == 0)
-            {
-                return null;
-            }
-
-            distractors.Shuffle(seed);
-            distractors = distractors.Take(5).ToArray();
-
             var stem = $"Which of the following can {relation.target}?";
 
-            return new Question
-            {
-                Stem = stem,
-                Answers = answers,
-                Distractors = distractors
-            };
+            return FillDistractors(seed, stem, answers);
         }
 
         private Question AskForCondition(Random seed, NamedRelation relation)
@@ -145,6 +113,13 @@ namespace QuizGen
                 .Select(x => x.target)
                 .ToArray();
 
+            var stem = $"How would you make sure {relation.subject} is enabled?";
+
+            return FillDistractors(seed, stem, answers);
+        }
+
+        private Question FillDistractors(Random seed, string stem, string[] answers)
+        {
             var distractors = knowledge.FindSimilar(answers);
 
             if (distractors.Length == 0)
@@ -154,8 +129,6 @@ namespace QuizGen
 
             distractors.Shuffle(seed);
             distractors = distractors.Take(5).ToArray();
-
-            var stem = $"How would you make sure {relation.subject} is enabled?";
 
             return new Question
             {
