@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace QuizGen
@@ -15,6 +17,7 @@ namespace QuizGen
 
         public Question Question(Random seed, NamedRelation relation)
         {
+            /*
             if (relation.name == "id")
             {
                 return AskForIdentity(seed, relation);
@@ -32,6 +35,9 @@ namespace QuizGen
                 return AskForCondition(seed, relation);
             }
             else return null;
+            */
+
+            return ExpandTemplate(seed, "{<id} belong under which option?");
         }
 
         private Question AskForIdentity(Random seed, NamedRelation relation)
@@ -136,6 +142,94 @@ namespace QuizGen
                 Answers = answers,
                 Distractors = distractors
             };
+        }
+
+        private Question ExpandTemplate(Random seed, string template)
+        {
+            // NOT WORKING YET
+            // keep at it
+
+            var str = new StringBuilder();
+            var start = 0;
+            string[] intersection = null;
+
+            var relations = new List<string>();
+
+            while (start < template.Length)
+            {
+                var index = template.IndexOf('{', start);
+                if (index == -1)
+                {
+                    str.Append(template.Substring(start, template.Length - start));
+                    break;
+                }
+
+                str.Append(template.Substring(start, index - start));
+                start = index + 1;
+
+                index = template.IndexOf('}', start);
+                if (index == -1)
+                    index = template.Length;
+
+                var pattern = template.Substring(start, index - start);
+                str.Append($"{{{relations.Count}}}");
+                start = index + 1;
+
+                relations.Add(pattern);
+
+                IEnumerable<string> potential;
+                if (pattern.StartsWith("<"))
+                {
+                    var relation = pattern.Substring(1);
+                    potential = knowledge.Relations
+                        .Where(x => x.name == relation)
+                        .Select(x => x.target);
+                }
+                else
+                {
+                    var relation = pattern.Substring(0, pattern.Length - 1);
+                    potential = knowledge.Relations
+                        .Where(x => x.name == relation)
+                        .Select(x => x.subject);
+                }
+
+                if (intersection == null)
+                {
+                    intersection = potential.ToArray();
+                }
+                else
+                {
+                    intersection = intersection.Intersect(potential).ToArray();
+                    if (intersection.Length == 0)
+                        return null;
+                }
+            }
+
+            var selected = seed.Choose(intersection);
+
+            var substitutions = relations.Select(pattern =>
+            {
+                if (pattern.StartsWith("<"))
+                {
+                    var relation = pattern.Substring(1);
+                    return knowledge.Relations
+                        .Where(x => x.name == relation && x.target == selected)
+                        .Select(x => x.subject)
+                        .FirstOrDefault();
+                }
+                else
+                {
+                    var relation = pattern.Substring(0, pattern.Length - 1);
+                    return knowledge.Relations
+                        .Where(x => x.name == relation && x.subject == selected)
+                        .Select(x => x.target)
+                        .FirstOrDefault();
+                }
+            });
+
+            var stem = string.Format(str.ToString(), selected);
+
+            return FillDistractors(seed, stem, substitutions.Take(3).ToArray());
         }
     }
 }
