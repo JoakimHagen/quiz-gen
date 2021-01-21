@@ -45,6 +45,23 @@ namespace QuizGen
                     .ToArray();
             }
 
+            var itemsAsfeatures = Relations
+                .Where(x => items.Contains(x.target) && x.name == "feature")
+                .Select(x => x.subject)
+                .ToArray();
+
+            if (itemsAsfeatures.Length > 0)
+            {
+                var similarFeatures = Relations
+                    .Where(x => itemsAsfeatures.Contains(x.subject) && x.name == "feature")
+                    .Select(x => x.target);
+
+                similar = similar
+                    .Concat(similarFeatures)
+                    .Distinct()
+                    .ToArray();
+            }
+
             var relationsTo = Relations
                 .Where(x => items.Contains(x.target))
                 .GroupBy(x => x.name);

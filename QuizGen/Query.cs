@@ -186,7 +186,7 @@ namespace QuizGen
             // The same candidates must have appeared in all predicates
 
             return candidateDict
-                .Where(x => x.Value == isCandidate.Length)
+                .Where(x => x.Value >= isCandidate.Length)
                 .Select(x => x.Key)
                 .ToArray();
         }

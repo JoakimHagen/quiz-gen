@@ -38,12 +38,13 @@ namespace QuizGen
             */
 
             var template = seed.Choose(
-                "{<id} belong in which category?",
+                /*"{<id} belong in which category?",
                 "Which options are an {id>}?",
                 "Which options are a feature of {<feature}?",
                 "Which options support {feature>}?",
                 "Which options can {ability>}?",
-                "How would you make sure {<condition} is enabled?"
+                "How would you make sure {<condition} is enabled?",*/
+                "What feature of {<feature} can {ability>}?"
                 );
 
             return ExpandTemplate(seed, template);
