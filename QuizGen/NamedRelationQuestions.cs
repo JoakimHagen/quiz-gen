@@ -38,12 +38,12 @@ namespace QuizGen
             */
 
             var template = seed.Choose(
-                "{<id} belong under which option?",
-                "Which of the following is an {id>}?",
-                "Which of the following is a feature of {<feature}?",
-                "Which of the following support {feature>}?",
-                "Which of the following can {ability>}?",
-                "How would you make sure {<feature} is enabled?"
+                "{<id} belong in which category?",
+                "Which options are an {id>}?",
+                "Which options are a feature of {<feature}?",
+                "Which options support {feature>}?",
+                "Which options can {ability>}?",
+                "How would you make sure {<condition} is enabled?"
                 );
 
             return ExpandTemplate(seed, template);
@@ -155,90 +155,15 @@ namespace QuizGen
 
         private Question ExpandTemplate(Random seed, string template)
         {
-            // NOT WORKING YET
-            // keep at it
+            var query = new Query(template);
 
-            var str = new StringBuilder();
-            var start = 0;
-            string[] intersection = null;
+            var answer = seed.Choose(query.GetCandidates(knowledge));
 
-            var relations = new List<string>();
+            var substs = query.GetSubstitutions(knowledge, answer);
 
-            while (start < template.Length)
-            {
-                var index = template.IndexOf('{', start);
-                if (index == -1)
-                {
-                    str.Append(template.Substring(start, template.Length - start));
-                    break;
-                }
+            var stem = string.Format(query.FormatString, substs);
 
-                str.Append(template.Substring(start, index - start));
-                start = index + 1;
-
-                index = template.IndexOf('}', start);
-                if (index == -1)
-                    index = template.Length;
-
-                var pattern = template.Substring(start, index - start);
-                str.Append($"{{{relations.Count}}}");
-                start = index + 1;
-
-                relations.Add(pattern);
-
-                IEnumerable<string> potential;
-                if (pattern.StartsWith("<"))
-                {
-                    var relation = pattern.Substring(1);
-                    potential = knowledge.Relations
-                        .Where(x => x.name == relation)
-                        .Select(x => x.target);
-                }
-                else
-                {
-                    var relation = pattern.Substring(0, pattern.Length - 1);
-                    potential = knowledge.Relations
-                        .Where(x => x.name == relation)
-                        .Select(x => x.subject);
-                }
-
-                if (intersection == null)
-                {
-                    intersection = potential.ToArray();
-                }
-                else
-                {
-                    intersection = intersection.Intersect(potential).ToArray();
-                    if (intersection.Length == 0)
-                        return null;
-                }
-            }
-
-            var selected = seed.Choose(intersection);
-
-            var substitutions = relations.Select(pattern =>
-            {
-                if (pattern.StartsWith("<"))
-                {
-                    var relation = pattern.Substring(1);
-                    return knowledge.Relations
-                        .Where(x => x.name == relation && x.target == selected)
-                        .Select(x => x.subject)
-                        .FirstOrDefault();
-                }
-                else
-                {
-                    var relation = pattern.Substring(0, pattern.Length - 1);
-                    return knowledge.Relations
-                        .Where(x => x.name == relation && x.subject == selected)
-                        .Select(x => x.target)
-                        .FirstOrDefault();
-                }
-            });
-
-            var stem = string.Format(str.ToString(), substitutions.ToArray());
-
-            return FillDistractors(seed, stem, new string[] { selected });
+            return FillDistractors(seed, stem, new string[] { answer });
         }
     }
 }
