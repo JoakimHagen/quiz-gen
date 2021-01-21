@@ -37,7 +37,16 @@ namespace QuizGen
             else return null;
             */
 
-            return ExpandTemplate(seed, "{<id} belong under which option?");
+            var template = seed.Choose(
+                "{<id} belong under which option?",
+                "Which of the following is an {id>}?",
+                "Which of the following is a feature of {<feature}?",
+                "Which of the following support {feature>}?",
+                "Which of the following can {ability>}?",
+                "How would you make sure {<feature} is enabled?"
+                );
+
+            return ExpandTemplate(seed, template);
         }
 
         private Question AskForIdentity(Random seed, NamedRelation relation)
@@ -227,9 +236,9 @@ namespace QuizGen
                 }
             });
 
-            var stem = string.Format(str.ToString(), selected);
+            var stem = string.Format(str.ToString(), substitutions.ToArray());
 
-            return FillDistractors(seed, stem, substitutions.Take(3).ToArray());
+            return FillDistractors(seed, stem, new string[] { selected });
         }
     }
 }
