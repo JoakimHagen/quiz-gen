@@ -38,12 +38,12 @@ namespace QuizGen
             */
 
             var template = seed.Choose(
-                /*"{<id} belong in which category?",
+                "{<id} belong in which category?",
                 "Which options are an {id>}?",
                 "Which options are a feature of {<feature}?",
                 "Which options support {feature>}?",
                 "Which options can {ability>}?",
-                "How would you make sure {<condition} is enabled?",*/
+                "How would you make sure {<condition} is enabled?",
                 "What feature of {<feature} can {ability>}?"
                 );
 
@@ -136,7 +136,10 @@ namespace QuizGen
 
         private Question FillDistractors(Random seed, string stem, string[] answers)
         {
-            var distractors = knowledge.FindSimilar(answers);
+            var distractors = knowledge.FindSimilar(answers)
+                .Distinct()
+                .Where(x => !answers.Contains(x))
+                .ToArray();
 
             if (distractors.Length == 0)
             {
@@ -158,7 +161,7 @@ namespace QuizGen
         {
             var query = new Query(template);
 
-            var answer = seed.Choose(query.GetCandidates(knowledge));
+            var answer = seed.Choose(query.GetAnswerCandidates(knowledge));
 
             var substs = query.GetSubstitutions(knowledge, answer);
 

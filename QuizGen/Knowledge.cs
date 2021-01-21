@@ -88,5 +88,68 @@ namespace QuizGen
 
             return similar;
         }
+
+        public string[] TracePattern(string pattern, string origin)
+        {
+            string[] validEndpoints = null;
+
+            if (pattern.StartsWith("<"))
+            {
+                var name = pattern.Substring(1);
+
+                validEndpoints = Relations
+                    .Where(x => x.name == name && x.target == origin)
+                    .Select(x => x.subject)
+                    .ToArray();
+            }
+            else if (pattern.EndsWith(">"))
+            {
+                var name = pattern.Substring(0, pattern.Length - 1);
+
+                validEndpoints = Relations
+                    .Where(x => x.name == name && x.subject == origin)
+                    .Select(x => x.target)
+                    .ToArray();
+            }
+            return validEndpoints;
+        }
+
+        public string[] TracePatternReverse(string pattern, string endPoint)
+        {
+            string[] validOrigins = null;
+
+            if (pattern.StartsWith("<"))
+            {
+                var name = pattern.Substring(1);
+
+                validOrigins = Relations
+                    .Where(x => x.name == name && x.subject == endPoint)
+                    .Select(x => x.target)
+                    .ToArray();
+            }
+            else if (pattern.EndsWith(">"))
+            {
+                var name = pattern.Substring(0, pattern.Length - 1);
+
+                validOrigins = Relations
+                    .Where(x => x.name == name && x.target == endPoint)
+                    .Select(x => x.subject)
+                    .ToArray();
+            }
+            return validOrigins;
+        }
+
+        public (string name, bool isLeft) ParsePattern(string pattern)
+        {
+            if (pattern.StartsWith("<"))
+            {
+                return (pattern.Substring(1), true);
+            }
+            else if (pattern.EndsWith(">"))
+            {
+                return (pattern.Substring(0, pattern.Length - 1), false);
+            }
+            return ("", false);
+        }
     }
 }
