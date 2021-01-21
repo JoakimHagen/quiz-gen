@@ -15,12 +15,15 @@ namespace QuizGen
 
         private Func<Knowledge, string, string>[] substitute;
 
+        private string[] patterns;
+
         public Query(string template)
         {
             Template = template;
             var str = new StringBuilder();
             var start = 0;
 
+            var patternsList = new List<string>();
             var isCandidates = new List<Func<Knowledge, NamedRelation, string>>();
             var substitutes  = new List<Func<Knowledge, string, string>>();
 
@@ -44,10 +47,12 @@ namespace QuizGen
                 str.Append($"{{{isCandidates.Count}}}");
                 start = index + 1;
 
+                patternsList.Add(pattern);
                 isCandidates.Add(ParsePatternCandidate(pattern));
                 substitutes.Add(ParsePatternSubst(pattern));
             }
 
+            patterns = patternsList.ToArray();
             isCandidate = isCandidates.ToArray();
             substitute = substitutes.ToArray();
             FormatString = str.ToString();
@@ -115,6 +120,46 @@ namespace QuizGen
             };
         }
 
+        public string[] GetAnswers(Knowledge knowledge, string[] substitutions)
+        {
+            // reverseSubst is basically just following relation from pattern to answer(origin)
+            Func<Knowledge, string, string, IEnumerable<string>> reverseSubst = (knowledge, pattern, subst) =>
+            {
+                if (pattern.StartsWith("<"))
+                {
+                    var name = pattern.Substring(1);
+
+                    return knowledge.Relations
+                        .Where(x => x.name == name && x.subject == subst)
+                        .Select(x => x.target);
+                }
+                else if (pattern.EndsWith(">"))
+                {
+                    var name = pattern.Substring(0, pattern.Length - 1);
+
+                    return knowledge.Relations
+                        .Where(x => x.name == name && x.target == subst)
+                        .Select(x => x.subject);
+                }
+                return null;
+            };
+
+            IEnumerable<string> answers = null;
+            for (int i = 0; i < patterns.Length; i++)
+            {
+                if (answers == null)
+                {
+                    answers = reverseSubst(knowledge, patterns[i], substitutions[i]);
+                }
+                else
+                {
+                    answers = answers.Intersect(reverseSubst(knowledge, patterns[i], substitutions[i]));
+                }
+            }
+
+            return answers.ToArray();
+        }
+        
         public string[] GetCandidates(Knowledge knowledge)
         {
             var candidateDict = new Dictionary<string, int>();

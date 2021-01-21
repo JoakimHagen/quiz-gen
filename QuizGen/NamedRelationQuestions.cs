@@ -161,9 +161,11 @@ namespace QuizGen
 
             var substs = query.GetSubstitutions(knowledge, answer);
 
+            var allAnswers = query.GetAnswers(knowledge, substs);
+
             var stem = string.Format(query.FormatString, substs);
 
-            return FillDistractors(seed, stem, new string[] { answer });
+            return FillDistractors(seed, stem, allAnswers);
         }
     }
 }
