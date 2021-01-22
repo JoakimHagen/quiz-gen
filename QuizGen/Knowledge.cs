@@ -92,22 +92,19 @@ namespace QuizGen
         public string[] TracePattern(string pattern, string origin)
         {
             string[] validEndpoints = null;
+            var path = ParsePattern(pattern);
 
-            if (pattern.StartsWith("<"))
+            if (path.isLeft)
             {
-                var name = pattern.Substring(1);
-
                 validEndpoints = Relations
-                    .Where(x => x.name == name && x.target == origin)
+                    .Where(x => x.name == path.name && x.target == origin)
                     .Select(x => x.subject)
                     .ToArray();
             }
-            else if (pattern.EndsWith(">"))
+            else
             {
-                var name = pattern.Substring(0, pattern.Length - 1);
-
                 validEndpoints = Relations
-                    .Where(x => x.name == name && x.subject == origin)
+                    .Where(x => x.name == path.name && x.subject == origin)
                     .Select(x => x.target)
                     .ToArray();
             }
@@ -117,22 +114,19 @@ namespace QuizGen
         public string[] TracePatternReverse(string pattern, string endPoint)
         {
             string[] validOrigins = null;
+            var path = ParsePattern(pattern);
 
-            if (pattern.StartsWith("<"))
+            if (path.isLeft)
             {
-                var name = pattern.Substring(1);
-
                 validOrigins = Relations
-                    .Where(x => x.name == name && x.subject == endPoint)
+                    .Where(x => x.name == path.name && x.subject == endPoint)
                     .Select(x => x.target)
                     .ToArray();
             }
-            else if (pattern.EndsWith(">"))
+            else
             {
-                var name = pattern.Substring(0, pattern.Length - 1);
-
                 validOrigins = Relations
-                    .Where(x => x.name == name && x.target == endPoint)
+                    .Where(x => x.name == path.name && x.target == endPoint)
                     .Select(x => x.subject)
                     .ToArray();
             }
