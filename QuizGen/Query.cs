@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -98,12 +99,12 @@ namespace QuizGen
                 .ToArray();
         }
 
-        public string[] GetSubstitutions(Knowledge knowledge, string answer)
+        public string[] GetSubstitutions(Knowledge knowledge, Random seed, string answer)
         {
             var str = new string[patterns.Length];
             for (int i = 0; i < patterns.Length; i++)
             {
-                str[i] = knowledge.TracePattern(patterns[i], answer).FirstOrDefault();
+                str[i] = seed.Choose(knowledge.TracePattern(patterns[i], answer));
             }
             return str;
         }

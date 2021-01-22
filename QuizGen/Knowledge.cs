@@ -9,6 +9,8 @@ namespace QuizGen
     /// </summary>
     public class Knowledge
     {
+        public List<string> QuestionTemplates;
+
         public List<NamedRelation> Relations;
 
         public string[] FindSimilar(IEnumerable<string> items)

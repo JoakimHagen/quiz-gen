@@ -14,24 +14,21 @@ namespace QuizGen
 
         public Question Question(Random seed)
         {
-            var template = seed.Choose(
-                "{<id} belong in which category?",
-                "Which options belong in category {id>}?",
-                "Which options are a feature of {<feature}?",
-                "Which options support {feature>}?",
-                "Which options can {ability>}?",
-                "How would you make sure {<condition} is enabled?",
-                "What feature of {<feature} can {ability>}?"
-                );
+            var template = seed.Choose(knowledge.QuestionTemplates);
 
-            return ExpandTemplate(seed, template);
-        }
+            var query = new Query(template);
 
-        private Question FillDistractors(Random seed, string stem, string[] answers)
-        {
-            var distractors = knowledge.FindSimilar(answers)
+            var answer = seed.Choose(query.GetAnswerCandidates(knowledge));
+
+            var substs = query.GetSubstitutions(knowledge, seed, answer);
+
+            var allAnswers = query.GetAnswers(knowledge, substs);
+
+            var stem = string.Format(query.FormatString, substs);
+
+            var distractors = knowledge.FindSimilar(allAnswers)
                 .Distinct()
-                .Where(x => !answers.Contains(x))
+                .Where(x => !allAnswers.Contains(x))
                 .ToArray();
 
             if (distractors.Length == 0)
@@ -45,24 +42,9 @@ namespace QuizGen
             return new Question
             {
                 Stem = stem,
-                Answers = answers,
+                Answers = allAnswers,
                 Distractors = distractors
             };
-        }
-
-        private Question ExpandTemplate(Random seed, string template)
-        {
-            var query = new Query(template);
-
-            var answer = seed.Choose(query.GetAnswerCandidates(knowledge));
-
-            var substs = query.GetSubstitutions(knowledge, answer);
-
-            var allAnswers = query.GetAnswers(knowledge, substs);
-
-            var stem = string.Format(query.FormatString, substs);
-
-            return FillDistractors(seed, stem, allAnswers);
         }
     }
 }
