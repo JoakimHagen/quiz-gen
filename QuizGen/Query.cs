@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace QuizGen
 {
@@ -21,29 +22,19 @@ namespace QuizGen
 
             var patternsList = new List<string>();
 
-            while (start < template.Length)
+            var matches = Regex.Matches(template, "{[^}]+}");
+
+            foreach (Match match in matches)
             {
-                var index = template.IndexOf('{', start);
-                if (index == -1)
-                {
-                    str.Append(template.Substring(start, template.Length - start));
-                    break;
-                }
+                str.Append(template.Substring(start, match.Index - start));
+                str.Append('{');
+                str.Append(patternsList.Count);
+                str.Append('}');
+                start = match.Index + match.Length;
 
-                str.Append(template.Substring(start, index - start));
-                start = index + 1;
-
-                index = template.IndexOf('}', start);
-                if (index == -1)
-                    index = template.Length;
-
-                var pattern = template.Substring(start, index - start);
-                str.Append($"{{{patternsList.Count}}}");
-                start = index + 1;
-
-                patternsList.Add(pattern);
+                patternsList.Add(match.Value.Substring(1, match.Length - 2));
             }
-
+            str.Append(template.Substring(start, template.Length - start));
             patterns = patternsList.ToArray();
             FormatString = str.ToString();
         }
