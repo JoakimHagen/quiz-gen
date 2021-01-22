@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -65,17 +64,17 @@ namespace QuizGen
 
             return answers.ToArray();
         }
-        
+
         public string[] GetAnswerCandidates(Knowledge knowledge)
         {
             var candidateDict = new Dictionary<string, int>();
 
+            var paths = patterns.Select(x => knowledge.ParsePattern(x));
+
             foreach (var rel in knowledge.Relations)
             {
-                foreach (var pattern in patterns)
+                foreach (var path in paths)
                 {
-                    var path = knowledge.ParsePattern(pattern);
-
                     if (rel.name != path.name)
                     {
                         var c = path.isLeft ? rel.target : rel.subject;
@@ -108,7 +107,5 @@ namespace QuizGen
             }
             return str;
         }
-
-
     }
 }

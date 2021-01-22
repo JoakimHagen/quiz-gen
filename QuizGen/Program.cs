@@ -11,17 +11,10 @@ namespace QuizGen
             var random = new Random();
 
             while (true)
-            {/*
-                var question = random.Choose<Random, Question>(
-                    AskAboutIdentity,
-                    AskAboutFeature,
-                    AskAboutCondition
-                )(random);
-                */
-
+            {
                 var qq = new NamedRelationQuestions(knowledge);
 
-                var question = qq.Question(random, knowledge.Relations[random.Next(0, knowledge.Relations.Count)]);
+                var question = qq.Question(random);
 
                 if (question != null)
                 {
