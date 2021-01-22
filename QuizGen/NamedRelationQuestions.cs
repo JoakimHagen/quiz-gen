@@ -22,6 +22,9 @@ namespace QuizGen
 
             var substs = query.GetSubstitutions(knowledge, seed, answer);
 
+            if (substs == null)
+                return null;
+
             var allAnswers = query.GetAnswers(knowledge, substs);
 
             var stem = string.Format(query.FormatString, substs);

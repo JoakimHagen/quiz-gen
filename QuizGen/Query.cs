@@ -70,13 +70,18 @@ namespace QuizGen
         {
             var candidateDict = new Dictionary<string, int>();
 
-            var paths = patterns.Select(x => knowledge.ParsePattern(x));
+            var paths = patterns
+                .Select(x => knowledge.ParsePattern(x))
+                .ToArray();
+
+            if (paths.Any(x => x.name == null))
+                return null;
 
             foreach (var rel in knowledge.Relations)
             {
                 foreach (var path in paths)
                 {
-                    if (rel.name != path.name)
+                    if (rel.name == path.name)
                     {
                         var c = path.isLeft ? rel.target : rel.subject;
                         if (candidateDict.ContainsKey(c))
@@ -104,7 +109,10 @@ namespace QuizGen
             var str = new string[patterns.Length];
             for (int i = 0; i < patterns.Length; i++)
             {
-                str[i] = seed.Choose(knowledge.TracePattern(patterns[i], answer));
+                var options = knowledge.TracePattern(patterns[i], answer);
+                if (options.Length == 0)
+                    return null;
+                str[i] = seed.Choose(options);
             }
             return str;
         }

@@ -4,8 +4,6 @@ namespace QuizGen
 {
     public class ExampleData : Knowledge
     {
-        private const string AZSRVC = "Azure Service";
-
         private const string DNSLB = "DNS Load Balancer";
         private const string L4LB  = "Layer 4 (Transport) Load Balancer";
         private const string L7LB  = "Layer 7 (Application) Load Balancer";
@@ -26,7 +24,7 @@ namespace QuizGen
         {
             QuestionTemplates = new List<string>
             {
-                "{<id} belong in which category?",
+                "{<id} belong in which categories?",
                 "Which options belong in category {id>}?",
                 "Which options are a feature of {<feature}?",
                 "Which options support {feature>}?",
@@ -37,9 +35,6 @@ namespace QuizGen
 
             Relations = new List<NamedRelation>
             {
-                new NamedRelation(DNSLB, "id", AZSRVC),
-                new NamedRelation(L4LB, "id", AZSRVC),
-                new NamedRelation(L7LB, "id", AZSRVC),
                 new NamedRelation(ALB, "id", L4LB),
                 new NamedRelation(ATM, "id", DNSLB),
                 new NamedRelation(AAG, "id", L7LB),

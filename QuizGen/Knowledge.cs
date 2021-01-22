@@ -13,82 +13,65 @@ namespace QuizGen
 
         public List<NamedRelation> Relations;
 
-        public string[] FindSimilar(IEnumerable<string> items)
+        public string[] FindSimilar(string[] items)
         {
-            var identityOfItems = Relations
-                .Where(x => items.Contains(x.subject) && x.name == "id")
-                .Select(x => x.target)
-                .ToArray();
+            var targetRels = new List<NamedRelation>();
+            var subjectRels = new List<NamedRelation>();
 
-            var similar = Relations
-                .Where(x => identityOfItems.Contains(x.target) && x.name == "id")
-                .Select(x => x.subject)
-                .Where(x => !items.Contains(x))
-                .ToArray();
-
-            var featuresOfItems = Relations
-                .Where(x => items.Contains(x.subject) && x.name == "feature")
-                .Select(x => x.target)
-                .ToArray();
-
-            if (featuresOfItems.Length > 0)
+            foreach (var rel in Relations)
             {
-                var subjectsWithSimilarFeatures = Relations
-                    .Where(x => x.name == "feature")
-                    .GroupBy(x => x.subject)
-                    .Select(g => (subject: g.Key, count: g.Count(x => featuresOfItems.Contains(x.target))))
-                    .Where(g => g.count > 0 && !items.Contains(g.subject))
-                    .OrderByDescending(g => g.count)
-                    .Take(5);
-
-                similar = similar
-                    .Concat(subjectsWithSimilarFeatures.Select(g => g.subject))
-                    .Distinct()
-                    .ToArray();
-            }
-
-            var itemsAsfeatures = Relations
-                .Where(x => items.Contains(x.target) && x.name == "feature")
-                .Select(x => x.subject)
-                .ToArray();
-
-            if (itemsAsfeatures.Length > 0)
-            {
-                var similarFeatures = Relations
-                    .Where(x => itemsAsfeatures.Contains(x.subject) && x.name == "feature")
-                    .Select(x => x.target);
-
-                similar = similar
-                    .Concat(similarFeatures)
-                    .Distinct()
-                    .ToArray();
-            }
-
-            var relationsTo = Relations
-                .Where(x => items.Contains(x.target))
-                .GroupBy(x => x.name);
-
-            foreach (var rel in relationsTo)
-            {
-                var key = rel.Key;
-                if (key.StartsWith('!'))
+                if (items.Contains(rel.subject))
                 {
-                    key = key.Substring(1);
-                }
-                else
-                {
-                    key = "!" + key;
+                    targetRels.Add(rel);
                 }
 
-                similar = similar
-                    .Concat(Relations
-                        .Where(x => x.name == key && rel.Any(y => y.subject == x.subject))
-                        .Select(x => x.target))
-                    .Distinct()
-                    .ToArray();
+                if (items.Contains(rel.target))
+                {
+                    subjectRels.Add(rel);
+                }
             }
 
-            return similar;
+            var countedTargets = targetRels.GroupBy(x => (x.target, name: TrimExclamation(x.name)))
+                .Select(g => (g.Key.target, g.Key.name, count: g.Count()))
+                .ToArray();
+
+            var countedSubjects = subjectRels.GroupBy(x => (x.subject, name: TrimExclamation(x.name)))
+                .Select(g => (g.Key.subject, g.Key.name, count: g.Count()))
+                .ToArray();
+
+            var backRefCounts = new List<(string item, int count)>();
+
+            foreach (var rel in Relations)
+            {
+                var name = TrimExclamation(rel.name);
+
+                if (!items.Contains(rel.subject))
+                {
+                    var count = countedTargets.Sum(x => (x.target == rel.target && x.name == name) ? x.count : 0);
+                    if (count > 0)
+                    {
+                        backRefCounts.Add((rel.subject, count));
+                    }
+                }
+
+                if (!items.Contains(rel.target))
+                {
+                    var count = countedSubjects.Sum(x => (x.subject == rel.subject && x.name == name) ? x.count : 0);
+                    if (count > 0)
+                    {
+                        backRefCounts.Add((rel.target, count));
+                    }
+                }
+            }
+
+            var similarItems = backRefCounts.GroupBy(x => x.item)
+                .Select(g => (item: g.Key, count: g.Sum(x => x.count)));
+
+            return similarItems
+                .OrderByDescending(x => x.count)
+                .Select(x => x.item)
+                .Take(Math.Max(4 - items.Length, 1))
+                .ToArray();
         }
 
         public string[] TracePattern(string pattern, string origin)
@@ -145,7 +128,12 @@ namespace QuizGen
             {
                 return (pattern.Substring(0, pattern.Length - 1), false);
             }
-            return ("", false);
+            return (null, false);
+        }
+
+        private static string TrimExclamation(string name)
+        {
+            return name.StartsWith('!') ? name.Substring(1) : name;
         }
     }
 }
