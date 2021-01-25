@@ -100,7 +100,20 @@ namespace QuizGen
                 var options = knowledge.TracePattern(patterns[i], answer);
                 if (options.Length == 0)
                     return null;
-                str[i] = seed.Choose(options);
+
+                var prior = str.Take(i);
+                while (true)
+                {
+                    str[i] = seed.Choose(options);
+
+                    // If the node is not already picked, break the loop
+                    if (!prior.Contains(str[i]))
+                        break;
+
+                    // If all our options are exhausted, return null
+                    else if (options.Intersect(prior).Count() == options.Length)
+                        return null;
+                }
             }
             return str;
         }
