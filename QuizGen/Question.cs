@@ -22,5 +22,15 @@ namespace QuizGen
                 Console.WriteLine(" - " + answer);
             }
         }
+
+        public override int GetHashCode()
+        {
+            int hash = Stem.GetHashCode();
+            foreach (var a in Answers)
+            {
+                hash ^= a.GetHashCode();
+            }
+            return hash;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace QuizGen
 {
@@ -10,6 +11,8 @@ namespace QuizGen
         {
             var random = new Random();
 
+            var alreadySeen = new List<int>();
+
             while (true)
             {
                 var qq = new NamedRelationQuestions(knowledge);
@@ -18,6 +21,12 @@ namespace QuizGen
 
                 if (question != null)
                 {
+                    var hash = question.GetHashCode();
+                    if (alreadySeen.Contains(hash))
+                        continue;
+                    else
+                        alreadySeen.Add(hash);
+
                     question.PrintToConsole(random);
                     Console.ReadLine();
 

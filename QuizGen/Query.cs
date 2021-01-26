@@ -24,12 +24,22 @@ namespace QuizGen
             foreach (Match match in matches)
             {
                 str.Append(template.Substring(start, match.Index - start));
-                str.Append('{');
-                str.Append(patternsList.Count);
-                str.Append('}');
+
+                // "{0}" is a legal substitution, but not graph pattern
+                if (Regex.IsMatch(match.Value, "{[0-9]+}"))
+                {
+                    str.Append(match.Value); // add "{#}" back to the string as it is
+                }
+                else
+                {
+                    str.Append('{');
+                    str.Append(patternsList.Count);
+                    str.Append('}');
+
+                    patternsList.Add(match.Value.Substring(1, match.Length - 2));
+                }
                 start = match.Index + match.Length;
 
-                patternsList.Add(match.Value.Substring(1, match.Length - 2));
             }
             str.Append(template.Substring(start, template.Length - start));
             patterns = patternsList.ToArray();
