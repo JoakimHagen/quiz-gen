@@ -5,10 +5,12 @@ namespace QuizGen
 {
     class Program
     {
-        static readonly Knowledge knowledge = new ExampleData();
+        static Knowledge knowledge;
 
         static void Main(string[] args)
         {
+            knowledge = ImportJson.ReadFile(@"exampledata.json");
+
             var random = new Random();
 
             var alreadySeen = new List<int>();
