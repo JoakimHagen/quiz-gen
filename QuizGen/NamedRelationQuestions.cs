@@ -18,7 +18,12 @@ namespace QuizGen
 
             var query = new Query(template);
 
-            var answer = seed.Choose(query.GetAnswerCandidates(knowledge));
+            var cands = query.GetAnswerCandidates(knowledge);
+
+            if (cands.Length == 0)
+                return null;
+
+            var answer = seed.Choose(cands);
 
             var substs = query.GetSubstitutions(knowledge, seed, answer);
 
