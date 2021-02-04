@@ -1,0 +1,54 @@
+{
+    "questionTemplates": [
+        "{<id} belong in which categories?",
+        "Which options belong in category {id>}?",
+        "Which options are a feature of {<feature}?",
+        "Which options support {feature>}?",
+        "Which options support both {feature>} and {feature>}?",
+        "Which options can {ability>}?",
+        "How would you make sure {<condition} is enabled?",
+        "What feature of {<feature} can {ability>}?"
+    ],
+    "relations": [
+        [3, "id", 1],
+        [4, "id", 0],
+        [5, "id", 2],
+        [6, "id", 2],
+        [6, "id", 0],
+        [6, "id", 7],
+
+        [4, "feature", 11],
+        [6, "feature", 11],
+        [6, "feature",  8],
+        [5, "feature",  8],
+        [6, "feature",  9],
+        [6, "feature", 10],
+        [4, "feature", 12],
+
+        [11, "ability", "direct dns requests to frontends based on location and latency"],
+        [ 8, "ability", "filter network traffic based on OSI Layer 7 (Application) data"],
+        [ 9, "ability", "route network traffic based on the device type of the requester"],
+        [10, "ability", "route network traffic based on the content of the request url query-string"],
+        [12, "ability", "measure network latency to Azure regions from the end users' client web-applications"],
+
+        [12, "condition",  "generating a RUM key and embedding it and a javascript file into the webpage"],
+        [12, "!condition", "switching the \"Real User Measurements\" feature on in the diagnostic settings"],
+        [12, "!condition", "connecting the resource to Application Insights"],
+        [12, "!condition", "doing nothing. It's enabled by default"]
+    ],
+    "lookup": [
+        "DNS Load Balancer",
+        "Layer 4 (Transport) Load Balancer",
+        "Layer 7 (Application) Load Balancer",
+        "Azure Load Balancer",
+        "Azure Traffic Manager",
+        "Azure Application Gateway",
+        "Azure Front Door",
+        "Azure Content Delivery Network (CDN)",
+        "web-application firewall",
+        "conditional device-type routing",
+        "conditional query-string routing",
+        "conditional domain name service (DNS) routing",
+        "Real User Measurements (RUM)"
+    ]
+}
